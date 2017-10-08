@@ -23,3 +23,32 @@ double avx_sum_calc(const double *in, arr_size num)
 	return sum;
 
 }
+/*
+When this file is compiled by gcc, you will use the following codes
+//////////////////////////////////////////////////////////////////
+
+double avx_sum_calc(const double *in, arr_size num)
+{
+	double sum = 0;
+	ATTR_ALIGN(32) double buf[4] = {};
+	const size_t ITER_NUM = 8;
+	size_t size_width = num / ITER_NUM;
+	size_t size_re = num % ITER_NUM;
+
+	for (size_t i = 0; i < size_width; ++i)
+	{
+		__m256d input1 = _mm256_load_pd(in);
+		__m256d input2 = _mm256_load_pd(in + 4);
+		__m256d output = _mm256_add_pd(input1, input2);
+		_mm256_store_pd(buf, output);
+		for (size_t i = 0; i<4; ++i)
+			sum += buf[i];
+		in += ITER_NUM;
+	}
+	for (size_t i = 0; i < size_re; ++i)
+		sum += in[i];
+	return sum;
+}
+/////////////////////////////////////////////
+*/
+
