@@ -28,7 +28,7 @@ public:
 	double TimerFinish() {
 		QueryPerformanceCounter(&large_integer);
 		IntEnd = large_integer.QuadPart;
-		DobMillseconds = (IntEnd - IntStart) * 1000 / DobDff; 
+		DobMillseconds = (IntEnd - IntStart) * 1000 / DobDff;
 		return DobMillseconds;
 	}
 private:
@@ -42,38 +42,53 @@ private:
 
 int main(int argc, char **argv)
 {
-	const arr_size NUM = 120000;
+	const arr_size NUM = 10000;
 	MyTimer timer;
 	ATTR_ALIGN(32) double ran_arr[NUM] = {};
+	ATTR_ALIGN(32) float ran_arr_float[2 * NUM] = {};
 
 	random_device de;
 	mt19937 ran(de());     //generate the random number
 
 	uniform_real_distribution<double> u_r_d(0.0, 10);
-	
+
 	double sum2 = 0;
 
-	for (size_t i = 0; i < NUM; ++i)
-		ran_arr[i] = u_r_d(ran);
+	for (size_t i = 0; i < 2 * NUM; ++i)
+	{
+		double tmp = u_r_d(ran);
+		if (i<NUM)
+			ran_arr[i] = tmp;
+		ran_arr_float[i] = tmp;
+	}
 	timer.TimerStart();
 	for (size_t i = 0; i < NUM; ++i)
 	{
 		sum2 += ran_arr[i];
 	}
 	double tm = timer.TimerFinish();
-	cout << "the original approach takes: "<<tm << std::endl;
+	cout << "the original approach takes: " << tm << std::endl;
 	MyTimer timer1;
 	tm = 0;
 	timer1.TimerStart();
-	double sum = avx_sum_calc(ran_arr, NUM);
+	double sum = avx_sum_calc_d(ran_arr, NUM);
 	tm = timer1.TimerFinish();
-	cout << "the avx approach takes:      " << tm << std::endl;
-	cout << "the sum2 used by original method is : " << endl;
+	cout << "the avx double approach takes:      " << tm << std::endl;
+
+	tm = 0;
+	timer1.TimerStart();
+	float sum3 = avx_sum_calc_s(ran_arr_float, NUM);
+	tm = timer1.TimerFinish();
+	cout << "the avx float approach takes:      " << tm << std::endl;
+
+	cout << "the sum2  by original method is : " << endl;
 	printf("%.16f\n", sum2);
 
-	cout << "the sum by avx instruction is : "<< endl;
+	cout << "the sum by avx double instruction is : " << endl;
 	printf("%.16f\n", sum);
 
+	cout << "the sum3 by avx float instruction is : " << endl;
+	printf("%.16f\n", sum3);
 
 	return 0;
 }
