@@ -68,21 +68,34 @@ int main(int argc, char **argv)
 	}
 	double tm = timer.TimerFinish();
 	cout << "the original approach takes: " << tm << std::endl;
+	MyTimer timer3;
+	tm = 0;
+	float sum4 = 0;
+	timer3.TimerStart();
+	for (size_t i = 0; i < NUM; ++i)
+	{
+		sum4 += ran_arr_float[i];
+	}
+	tm = timer3.TimerFinish();
+	cout << "the original float approach takes: " << tm << std::endl;
 	MyTimer timer1;
 	tm = 0;
 	timer1.TimerStart();
 	double sum = avx_sum_calc_d(ran_arr, NUM);
 	tm = timer1.TimerFinish();
 	cout << "the avx double approach takes:      " << tm << std::endl;
-
+	MyTimer timer2;
 	tm = 0;
-	timer1.TimerStart();
+	timer2.TimerStart();
 	float sum3 = avx_sum_calc_s(ran_arr_float, NUM);
-	tm = timer1.TimerFinish();
+	tm = timer2.TimerFinish();
 	cout << "the avx float approach takes:      " << tm << std::endl;
 
-	cout << "the sum2  by original method is : " << endl;
+	cout << "the sum2  by original double method is : " << endl;
 	printf("%.16f\n", sum2);
+
+	cout << "the sum4  by original float method is : " << endl;
+	printf("%.16f\n", sum4);
 
 	cout << "the sum by avx double instruction is : " << endl;
 	printf("%.16f\n", sum);
